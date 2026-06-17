@@ -1,0 +1,49 @@
+/* About.css — two-column bio layout that collapses on small screens. */
+
+.about__grid {
+  display: grid;
+  /* Bio takes 2 shares, skills takes 1. */
+  grid-template-columns: 2fr 1fr;
+  gap: 2.5rem;
+  align-items: start;
+}
+
+.about__bio p + p {
+  margin-top: 1rem; /* space between stacked paragraphs */
+}
+
+.about__bio p {
+  color: var(--color-muted);
+  font-size: 1.05rem;
+}
+
+.about__skills-title {
+  font-size: 1rem;
+  margin-bottom: 1rem;
+  color: var(--color-text);
+}
+
+/* Skill tags: a flexible, wrapping row of pills. */
+.about__tags {
+  list-style: none;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
+.about__tag {
+  background-color: var(--color-surface);
+  border: 1px solid var(--color-border);
+  color: var(--color-muted);
+  padding: 0.35rem 0.75rem;
+  border-radius: 999px; /* fully rounded pill shape */
+  font-size: 0.85rem;
+}
+
+/* Stack the two columns vertically on tablets and phones. */
+@media (max-width: 768px) {
+  .about__grid {
+    grid-template-columns: 1fr;
+    gap: 2rem;
+  }
+}

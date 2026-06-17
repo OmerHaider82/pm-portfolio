@@ -1,0 +1,48 @@
+/* Header.css — styles scoped to the sticky top navigation. */
+
+.site-header {
+  position: sticky; /* stays pinned to the top while scrolling */
+  top: 0;
+  z-index: 10; /* sits above page content                 */
+  background-color: rgba(15, 17, 21, 0.8);
+  backdrop-filter: blur(8px); /* frosted-glass effect over content  */
+  border-bottom: 1px solid var(--color-border);
+}
+
+/* Flex row: brand on the left, nav on the right. */
+.site-header__inner {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  height: 64px;
+}
+
+.site-header__brand {
+  font-weight: 700;
+  color: var(--color-text);
+}
+.site-header__brand:hover {
+  text-decoration: none;
+}
+
+.site-header__nav {
+  display: flex;
+  gap: 1.5rem;
+}
+
+.site-header__nav a {
+  color: var(--color-muted);
+  font-size: 0.95rem;
+}
+.site-header__nav a:hover {
+  color: var(--color-text);
+  text-decoration: none;
+}
+
+/* On narrow screens, hide the nav links to keep the bar clean.
+   (The brand still links back to the top.) */
+@media (max-width: 560px) {
+  .site-header__nav {
+    display: none;
+  }
+}

@@ -1,0 +1,71 @@
+/* Hero.css — the top banner plus the shared button styles. */
+
+.hero__inner {
+  /* Center the hero contents and give it generous breathing room. */
+  text-align: center;
+  max-width: 720px;
+  padding-block: 2rem 1rem;
+}
+
+.hero__eyebrow {
+  color: var(--color-accent);
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  margin-bottom: 0.75rem;
+}
+
+.hero__title {
+  /* clamp(min, preferred, max) scales the font with the viewport,
+     so it looks right on phones and big monitors without media queries. */
+  font-size: clamp(2.5rem, 7vw, 4.5rem);
+  line-height: 1.05;
+  letter-spacing: -0.02em;
+  margin-bottom: 1rem;
+}
+
+.hero__tagline {
+  color: var(--color-muted);
+  font-size: clamp(1rem, 2.2vw, 1.25rem);
+  margin-inline: auto;
+  margin-bottom: 2rem;
+}
+
+/* Button row — wraps onto two lines if the screen is very narrow. */
+.hero__actions {
+  display: flex;
+  gap: 1rem;
+  justify-content: center;
+  flex-wrap: wrap;
+}
+
+/* ---- Shared button styles (used here and in the footer) ---- */
+.btn {
+  display: inline-block;
+  padding: 0.75rem 1.5rem;
+  border-radius: var(--radius);
+  font-weight: 600;
+  border: 1px solid transparent;
+  transition:
+    transform 0.15s ease,
+    background-color 0.15s ease;
+}
+.btn:hover {
+  text-decoration: none;
+  transform: translateY(-2px); /* subtle lift on hover */
+}
+
+/* Solid accent button for the primary action. */
+.btn--primary {
+  background-color: var(--color-accent);
+  color: #0f1115;
+}
+
+/* Outlined button for the secondary action. */
+.btn--ghost {
+  border-color: var(--color-border);
+  color: var(--color-text);
+}
+.btn--ghost:hover {
+  background-color: var(--color-accent-soft);
+  border-color: var(--color-accent);
+}

@@ -1,0 +1,70 @@
+/* Projects.css — the responsive card grid and the card styling. */
+
+/* auto-fit + minmax = a self-adjusting grid: as many columns as fit,
+   each at least 260px wide, wrapping automatically. No media queries
+   needed for the column count. */
+.projects__grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  gap: 1.5rem;
+}
+
+/* ---- Individual card ---- */
+.project-card {
+  background-color: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius);
+  overflow: hidden; /* clips the thumbnail's corners */
+  display: flex;
+  flex-direction: column;
+  transition:
+    transform 0.15s ease,
+    border-color 0.15s ease;
+}
+.project-card:hover {
+  transform: translateY(-4px); /* lift the card on hover */
+  border-color: var(--color-accent);
+}
+
+/* Placeholder thumbnail: a soft gradient block. Swap for a real image. */
+.project-card__thumb {
+  aspect-ratio: 16 / 9;
+  background: linear-gradient(135deg, #6c8cff33, #6c8cff11);
+}
+
+.project-card__body {
+  padding: 1.25rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  flex: 1; /* fills height so cards align */
+}
+
+.project-card__title {
+  font-size: 1.15rem;
+}
+
+.project-card__desc {
+  color: var(--color-muted);
+  font-size: 0.95rem;
+}
+
+.project-card__tags {
+  list-style: none;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+}
+.project-card__tags li {
+  font-size: 0.75rem;
+  color: var(--color-accent);
+  background-color: var(--color-accent-soft);
+  padding: 0.2rem 0.6rem;
+  border-radius: 999px;
+}
+
+.project-card__link {
+  margin-top: auto; /* pins the link to the card bottom */
+  font-weight: 600;
+  font-size: 0.9rem;
+}
