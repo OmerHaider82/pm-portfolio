@@ -1,6 +1,6 @@
-# GitHub Actions CI workflow.
-# Runs automatically on GitHub's servers for every push and pull request
-# targeting `main`, so broken code is caught before it's merged.
+# GitHub Actions CI/CD workflow.
+# Runs lint/test/build on every push and pull request targeting `main`,
+# and—on pushes to `main` only—deploys the built site to AWS (S3 + CloudFront).
 name: CI
 
 on:
@@ -8,6 +8,12 @@ on:
     branches: [main]
   pull_request:
     branches: [main]
+
+# OIDC needs id-token: write so the deploy job can mint a token to assume the
+# AWS role; contents: read lets the runner check out the repo.
+permissions:
+  id-token: write
+  contents: read
 
 jobs:
   verify:
@@ -42,3 +48,44 @@ jobs:
 
       - name: Build
         run: npm run build
+
+      # 5. Hand the built site off to the deploy job as an artifact so it
+      #    publishes the exact bits we just tested.
+      - name: Upload build output
+        uses: actions/upload-artifact@v4
+        with:
+          name: dist
+          path: ./dist
+
+  # Deploy the built site to AWS. Runs only after `build` succeeds and only
+  # on pushes to `main`, so pull requests still get lint/test/build but never
+  # touch production.
+  deploy:
+    needs: verify
+    if: github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+
+    steps:
+      # Pull down the artifact the build job produced into ./dist.
+      - name: Download build output
+        uses: actions/download-artifact@v4
+        with:
+          name: dist
+          path: ./dist
+
+      # Exchange the GitHub OIDC token for short-lived AWS credentials by
+      # assuming the deploy role—no long-lived access keys stored anywhere.
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: arn:aws:iam::530732072836:role/github-deploy-role
+          aws-region: us-east-2
+
+      # Copy the site to S3. --delete removes files in the bucket that no
+      # longer exist in the build, keeping the bucket in sync with ./dist.
+      - name: Sync to S3
+        run: aws s3 sync ./dist s3://pm-portfolio-site-omerhaider82 --delete
+
+      # Bust the CloudFront cache so visitors get the new version right away.
+      - name: Invalidate CloudFront
+        run: aws cloudfront create-invalidation --distribution-id E23ID472W1WDLH --paths "/*"

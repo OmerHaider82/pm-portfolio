@@ -3,7 +3,10 @@ import { defineConfig } from "vite";
 import react from "@vitejs/plugin-react";
 
 // https://vite.dev/config/
+// The site is served from the domain root on CloudFront/S3, so assets use
+// the default "/" base in both dev and production.
 export default defineConfig({
+  base: "/",
   plugins: [react()],
   // Vitest configuration lives here under the `test` key.
   test: {
