@@ -31,4 +31,12 @@ export default defineConfig([
       globals: globals.vitest,
     },
   },
+  {
+    // Playwright config and E2E specs run in Node (not the browser), so they
+    // use Node globals like `process` rather than browser ones.
+    files: ["playwright.config.js", "e2e/**"],
+    languageOptions: {
+      globals: globals.node,
+    },
+  },
 ]);
