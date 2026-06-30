@@ -89,3 +89,78 @@ jobs:
       # Bust the CloudFront cache so visitors get the new version right away.
       - name: Invalidate CloudFront
         run: aws cloudfront create-invalidation --distribution-id E23ID472W1WDLH --paths "/*"
+
+  # Run the Playwright end-to-end tests on every pull request. This drives a
+  # real browser against the production build, so it catches integration issues
+  # the jsdom unit tests can't. It runs independently of `verify`/`deploy`, so a
+  # failure here surfaces on the PR but never blocks the deploy to production.
+  e2e:
+    if: github.event_name == 'pull_request'
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Check out code
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      # Download the browser binaries Playwright drives, plus the OS libraries
+      # they need on the runner.
+      - name: Install Playwright browsers
+        run: npx playwright install --with-deps chromium
+
+      # The Playwright config builds and serves the site itself (via webServer),
+      # but we build here too so a build failure is reported as its own step.
+      - name: Build
+        run: npm run build
+
+      - name: Run E2E tests
+        run: npm run test:e2e
+
+      # Always upload the HTML report so you can download and open it from the
+      # run's Artifacts section — useful especially when a test failed.
+      - name: Upload Playwright report
+        if: ${{ !cancelled() }}
+        uses: actions/upload-artifact@v4
+        with:
+          name: playwright-report
+          path: playwright-report/
+          retention-days: 30
+
+  # Audit the site with Lighthouse on every pull request. This job is purely
+  # informational for now: assertions run in "warn" mode (see lighthouserc.json),
+  # so low scores show up in the log but never turn the PR red or block merging.
+  lighthouse:
+    if: github.event_name == 'pull_request'
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Check out code
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      # Produce the real production bundle into ./dist. lhci serves these exact
+      # files (via staticDistDir in lighthouserc.json) rather than the dev server.
+      - name: Build
+        run: npm run build
+
+      # autorun = collect (serve dist + run Lighthouse 3x) → assert (warn) →
+      # upload (temporary-public-storage). The job log prints a shareable report
+      # URL you can open to see all four category scores.
+      - name: Run Lighthouse CI
+        run: npx lhci autorun
