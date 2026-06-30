@@ -15,6 +15,11 @@ dist-ssr
 # Test coverage output
 coverage
 
+# Playwright end-to-end output
+/test-results
+/playwright-report
+/playwright/.cache
+
 # Environment variable files (keep secrets out of git)
 .env
 .env.*
